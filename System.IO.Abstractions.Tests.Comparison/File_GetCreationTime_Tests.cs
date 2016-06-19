@@ -48,20 +48,11 @@ namespace System.IO.Abstractions.Tests.Comparison
             var mockFileSystem = new MockFileSystem();
             var realFileSystem = new FileSystem();
 
-            FileInfoBase realFile = null;
-            try
-            {
-                realFile = prepare(realFileSystem);
-                var mockFile = prepare(mockFileSystem);
-                Func<IFileSystem, FileSystemType, FileInfoBase, bool> execute = (fs, _, file) => fs.File.Exists(file.FullName);
+            var realFile = prepare(realFileSystem);
+            var mockFile = prepare(mockFileSystem);
+            Func<IFileSystem, FileSystemType, FileInfoBase, bool> execute = (fs, _, file) => fs.File.Exists(file.FullName);
 
-                execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, realFile, mockFile);
-            }
-            finally
-            {
-                // only the real file system must be cleaned
-                clean(realFile);
-            }
+            execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, realFile, mockFile, (_, file) => clean(file));
         }
     }
 }

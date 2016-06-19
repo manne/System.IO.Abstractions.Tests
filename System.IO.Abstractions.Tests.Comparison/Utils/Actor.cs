@@ -1,4 +1,5 @@
 using System.IO.Abstractions.TestingHelpers;
+
 using FluentAssertions;
 
 namespace System.IO.Abstractions.Tests.Comparison.Utils
@@ -36,7 +37,7 @@ namespace System.IO.Abstractions.Tests.Comparison.Utils
             }
         }
 
-        public static void OnFileSystemsWithParameter<TParameter, TResult>(this Func<IFileSystem, FileSystemType, TParameter, TResult> action, FileSystem realFileSystem, MockFileSystem mockFileSystem, TParameter realParameter, TParameter mockParameter)
+        public static void OnFileSystemsWithParameter<TParameter, TResult>(this Func<IFileSystem, FileSystemType, TParameter, TResult> action, FileSystem realFileSystem, MockFileSystem mockFileSystem, TParameter realParameter, TParameter mockParameter, Action<IFileSystem, TParameter> cleanAction = null)
         {
             Exception realException = null;
             TResult realResult = default(TResult);
@@ -60,16 +61,36 @@ namespace System.IO.Abstractions.Tests.Comparison.Utils
                 mockException = e;
             }
 
-            if (realException != null)
+            try
             {
-                mockException.Should().NotBeNull("the action on the real file system fired an exception");
+                if (realException != null)
+                {
+                    mockException.Should().NotBeNull("the action on the real file system fired an exception");
 
-                // ReSharper disable PossibleNullReferenceException Reason: code can not be reached if is null
-                mockException.GetType().Should().Be(realException.GetType(), "the mock file system should throw an exception of the the same type as the real file system");
-                // ReSharper restore PossibleNullReferenceException
+                    // ReSharper disable PossibleNullReferenceException Reason: code can not be reached if is null
+                    mockException.GetType().Should().Be(realException.GetType(), "the mock file system should throw an exception of the the same type as the real file system");
+                    // ReSharper restore PossibleNullReferenceException
+                }
+
+                mockResult.Should().Be(realResult);
             }
+            catch
+            {
+                if (cleanAction != null)
+                {
 
-            mockResult.Should().Be(realResult);
+                    try
+                    {
+                        cleanAction(realFileSystem, realParameter);
+                    }
+                    catch
+                    {
+
+                    }
+                }
+
+                throw;
+            }
         }
     }
 }
