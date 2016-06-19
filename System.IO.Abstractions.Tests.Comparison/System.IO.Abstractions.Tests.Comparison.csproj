@@ -80,6 +80,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="File_AppendAllLines_Tests.cs" />
+    <Compile Include="File_GetCreationTime_Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
