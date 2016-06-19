@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using System.IO.Abstractions.TestingHelpers;
 using System.IO.Abstractions.Tests.Comparison.Utils;
 using System.Text;
@@ -9,12 +8,12 @@ using Xunit.Abstractions;
 namespace System.IO.Abstractions.Tests.Comparison
 {
     [Collection(CollectionDefinitions.THE_TRUTH)]
-    public class File_AppendAllLines_Tests
+    public class File_AppendAllText_Tests
     {
         private readonly ITestOutputHelper _output;
         private readonly FileSystemFixture _fileSystemFixture;
 
-        public File_AppendAllLines_Tests(ITestOutputHelper output, FileSystemFixture fileSystemFixture)
+        public File_AppendAllText_Tests(ITestOutputHelper output, FileSystemFixture fileSystemFixture)
         {
             if (output == null)
             {
@@ -31,27 +30,37 @@ namespace System.IO.Abstractions.Tests.Comparison
         }
 
         [Fact]
-        public void AppendAllLines_PathContainsInvalidCharacters()
+        public void AppendAllText_PathIsNull()
         {
             // Arrange
             var mockFileSystem = new MockFileSystem();
             var realFileSystem = new FileSystem();
 
             // Act
-            Action<IFileSystem, FileSystemType> action = (fs, _) => fs.File.AppendAllLines("|", new[] {"does not matter"});
+            Action<IFileSystem, FileSystemType> action = (fs, _) => fs.File.AppendAllText(null, "does not matter");
 
             // Assert
             action.OnFileSystems(realFileSystem, mockFileSystem);
         }
 
         [Fact]
-        public void AppendAllLines_WithWeirdEncoding()
+        public void AppendAllText_PathContainsInvalidCharacters()
         {
-            var linesToAppend = new List<string>
-            {
-                "first line",
-                "Î♫"
-            };
+            // Arrange
+            var mockFileSystem = new MockFileSystem();
+            var realFileSystem = new FileSystem();
+
+            // Act
+            Action<IFileSystem, FileSystemType> action = (fs, _) => fs.File.AppendAllText("|", "does not matter");
+
+            // Assert
+            action.OnFileSystems(realFileSystem, mockFileSystem);
+        }
+
+        [Fact]
+        public void AppendAllText_WithWeirdEncoding()
+        {
+            var linesToAppend = "first line Î♫";
 
             Func<IFileSystem, FileInfoBase> prepare = system =>
             {
@@ -68,7 +77,7 @@ namespace System.IO.Abstractions.Tests.Comparison
 
             var realFile = prepare(realFileSystem);
             var mockFile = prepare(mockFileSystem);
-            Action<IFileSystem, FileSystemType, FileInfoBase> execute = (fs, _, file) => fs.File.AppendAllLines(file.FullName, linesToAppend, Encoding.UTF32);
+            Action<IFileSystem, FileSystemType, FileInfoBase> execute = (fs, _, file) => fs.File.AppendAllText(file.FullName, linesToAppend, Encoding.UTF32);
             execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, realFile, mockFile);
         }
     }

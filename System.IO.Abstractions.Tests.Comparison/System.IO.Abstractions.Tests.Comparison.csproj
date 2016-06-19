@@ -30,12 +30,20 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Bogus, Version=7.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Bogus.7.1.2\lib\net40\Bogus.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="FluentAssertions, Version=4.9.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
       <HintPath>..\packages\FluentAssertions.4.9.0\lib\net45\FluentAssertions.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="FluentAssertions.Core, Version=4.9.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
       <HintPath>..\packages\FluentAssertions.4.9.0\lib\net45\FluentAssertions.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -66,11 +74,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="File_AppendAllLines_Tests.cs" />
+    <Compile Include="File_Encrypt_Tests.cs" />
+    <Compile Include="File_Decrypt_Tests.cs" />
+    <Compile Include="File_GetAttributes_Tests.cs" />
+    <Compile Include="File_SetAttributes_Tests.cs" />
     <Compile Include="File_Exists_Tests.cs" />
+    <Compile Include="File_ReadWrite_RoundTrip_Tests.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\FileSystemType.cs" />
     <Compile Include="Utils\Actor.cs" />
-    <Compile Include="File_AppendAllLines_Tests.cs" />
+    <Compile Include="File_AppendAllText_Tests.cs" />
     <Compile Include="File_GetCreationTime_Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\CollectionDefinitions.cs" />

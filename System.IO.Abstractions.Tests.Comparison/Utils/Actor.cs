@@ -5,16 +5,27 @@ namespace System.IO.Abstractions.Tests.Comparison.Utils
 {
     public static class Actor
     {
+        public delegate void CustomResultComparer<T>(T realParameter, T MockParameter);
+
         public static void OnFileSystems(this Action<IFileSystem, FileSystemType> action, FileSystem realFileSystem, MockFileSystem mockFileSystem)
         {
-            OnFileSystemsWithParameter<object, object>((fs, fst, _) =>
+            OnFileSystemsWithParameter<object, object>((fileSystem, fileSystemType, _) =>
             {
-                action(fs, fst);
+                action(fileSystem, fileSystemType);
                 return null;
             }, realFileSystem, mockFileSystem, null, null);
         }
 
-        public static void OnFileSystemsWithParameter<TParameter, TResult>(this Func<IFileSystem, FileSystemType, TParameter, TResult> function, FileSystem realFileSystem, MockFileSystem mockFileSystem, TParameter realParameter, TParameter mockParameter, Action<IFileSystem, TParameter> cleanAction = null, Action<TResult, TResult> customResultComparer = null)
+        public static void OnFileSystemsWithParameter<TParameter>(this Action<IFileSystem, FileSystemType, TParameter> action, FileSystem realFileSystem, MockFileSystem mockFileSystem, TParameter realParameter, TParameter mockParameter)
+        {
+            OnFileSystemsWithParameter<TParameter, object>((fileSystem, fileSystemType, parameter) =>
+            {
+                action(fileSystem, fileSystemType, parameter);
+                return null;
+            }, realFileSystem, mockFileSystem, realParameter, mockParameter);
+        }
+
+        public static void OnFileSystemsWithParameter<TParameter, TResult>(this Func<IFileSystem, FileSystemType, TParameter, TResult> function, FileSystem realFileSystem, MockFileSystem mockFileSystem, TParameter realParameter, TParameter mockParameter, Action<IFileSystem, TParameter> cleanAction = null, CustomResultComparer<TResult> customResultComparer = null)
         {
             Exception realException = null;
             TResult realResult = default(TResult);

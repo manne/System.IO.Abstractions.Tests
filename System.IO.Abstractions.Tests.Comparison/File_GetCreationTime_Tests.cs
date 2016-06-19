@@ -37,7 +37,7 @@ namespace System.IO.Abstractions.Tests.Comparison
 
             Func<IFileSystem, FileSystemType, FileInfoBase, DateTime> execute = (fs, _, file) => fs.File.GetCreationTime(null);
 
-            Action<DateTime, DateTime> ignoreComparison = (_, __) => { };
+            Actor.CustomResultComparer<DateTime> ignoreComparison = (_, __) => { };
             execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, null, null, null, ignoreComparison);
         }
 
@@ -62,7 +62,7 @@ namespace System.IO.Abstractions.Tests.Comparison
             var mockFile = prepare(mockFileSystem);
             Func<IFileSystem, FileSystemType, FileInfoBase, DateTime> execute = (fs, _, file) => fs.File.GetCreationTime(file.FullName);
 
-            Action<DateTime, DateTime> ignoreComparison = (_, __) => { };
+            Actor.CustomResultComparer<DateTime> ignoreComparison = (_, __) => { };
             execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, realFile, mockFile, null, ignoreComparison);
         }
 

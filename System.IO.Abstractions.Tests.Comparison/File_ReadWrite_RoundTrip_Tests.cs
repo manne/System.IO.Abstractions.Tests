@@ -3,18 +3,19 @@ using System.Globalization;
 using System.IO.Abstractions.TestingHelpers;
 using System.IO.Abstractions.Tests.Comparison.Utils;
 using System.Text;
+using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace System.IO.Abstractions.Tests.Comparison
 {
     [Collection(CollectionDefinitions.THE_TRUTH)]
-    public class File_AppendAllLines_Tests
+    public class File_ReadWrite_RoundTrip_Tests
     {
         private readonly ITestOutputHelper _output;
         private readonly FileSystemFixture _fileSystemFixture;
 
-        public File_AppendAllLines_Tests(ITestOutputHelper output, FileSystemFixture fileSystemFixture)
+        public File_ReadWrite_RoundTrip_Tests(ITestOutputHelper output, FileSystemFixture fileSystemFixture)
         {
             if (output == null)
             {
@@ -30,27 +31,26 @@ namespace System.IO.Abstractions.Tests.Comparison
             _fileSystemFixture = fileSystemFixture;
         }
 
-        [Fact]
-        public void AppendAllLines_PathContainsInvalidCharacters()
+        private static IEnumerable<Encoding[]> GetEncodings()
         {
-            // Arrange
-            var mockFileSystem = new MockFileSystem();
-            var realFileSystem = new FileSystem();
-
-            // Act
-            Action<IFileSystem, FileSystemType> action = (fs, _) => fs.File.AppendAllLines("|", new[] {"does not matter"});
-
-            // Assert
-            action.OnFileSystems(realFileSystem, mockFileSystem);
+            yield return new []{ Encoding.ASCII };
+            yield return new []{ Encoding.BigEndianUnicode };
+            yield return new []{ Encoding.UTF32 };
+            yield return new []{ Encoding.UTF7 };
+            yield return new []{ Encoding.UTF8 };
+            yield return new []{ Encoding.Default };
+            yield return new[] { Encoding.Unicode };
         }
 
-        [Fact]
-        public void AppendAllLines_WithWeirdEncoding()
+        [Theory]
+        [MemberData(nameof(GetEncodings))]
+        public void ReadWrite_Encoding(Encoding encoding)
         {
+            var faker = new Bogus.Faker("ko");
             var linesToAppend = new List<string>
             {
-                "first line",
-                "Î♫"
+                faker.Lorem.Lines(20, Environment.NewLine),
+                faker.Lorem.Lines(20, Environment.NewLine)
             };
 
             Func<IFileSystem, FileInfoBase> prepare = system =>
@@ -68,8 +68,28 @@ namespace System.IO.Abstractions.Tests.Comparison
 
             var realFile = prepare(realFileSystem);
             var mockFile = prepare(mockFileSystem);
-            Action<IFileSystem, FileSystemType, FileInfoBase> execute = (fs, _, file) => fs.File.AppendAllLines(file.FullName, linesToAppend, Encoding.UTF32);
-            execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, realFile, mockFile);
+            Func<IFileSystem, FileSystemType, FileInfoBase, string> execute = (fs, fst, file) =>
+            {
+                fs.File.AppendAllLines(file.FullName, linesToAppend, encoding);
+                var l = fs.File.ReadAllText(file.FullName);
+                _output.WriteLine("Data of {0}", fst);
+                _output.WriteLine(l);
+
+                return l;
+            };
+
+            Actor.CustomResultComparer<string> comparer = (r, m) =>
+            {
+                if (r == null)
+                {
+                    m.Should().BeNull();
+                }
+                else
+                {
+                    m.Should().Be(r);
+                }
+            };
+            execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, realFile, mockFile, null, comparer);
         }
     }
 }
