@@ -21,10 +21,4 @@ namespace System.IO.Abstractions.Tests.Comparison
             action.OnFileSystems(realFileSystem, mockFileSystem);
         }
     }
-
-    public enum FileSystemType
-    {
-        Real = 0,
-        Mock = 1
-    }
 }
