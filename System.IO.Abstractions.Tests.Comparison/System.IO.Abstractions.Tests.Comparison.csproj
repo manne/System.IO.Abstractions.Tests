@@ -66,6 +66,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Utils\Actor.cs" />
     <Compile Include="File_AppendAllLines_Tests.cs" />
     <Compile Include="File_GetCreationTime_Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
