@@ -8,12 +8,12 @@ using Xunit.Abstractions;
 namespace System.IO.Abstractions.Tests.Comparison
 {
     [Collection(CollectionDefinitions.THE_TRUTH)]
-    public class File_GetCreationTime_Tests
+    public class File_Exists_Tests
     {
         private readonly ITestOutputHelper _output;
         private readonly FileSystemFixture _fileSystemFixture;
 
-        public File_GetCreationTime_Tests(ITestOutputHelper output, FileSystemFixture fileSystemFixture)
+        public File_Exists_Tests(ITestOutputHelper output, FileSystemFixture fileSystemFixture)
         {
             if (output == null)
             {
@@ -30,28 +30,39 @@ namespace System.IO.Abstractions.Tests.Comparison
         }
 
         [Fact]
-        public void GetCreationTime_ArgumentNull()
+        public void FileExists_ArgumentNull()
         {
             var mockFileSystem = new MockFileSystem();
             var realFileSystem = new FileSystem();
 
-            Func<IFileSystem, FileSystemType, FileInfoBase, DateTime> execute = (fs, _, file) => fs.File.GetCreationTime(null);
+            Func<IFileSystem, FileSystemType, FileInfoBase, bool> execute = (fs, _, file) => fs.File.Exists(null);
 
-            Action<DateTime, DateTime> ignoreComparison = (_, __) => { };
-            execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, null, null, null, ignoreComparison);
+            execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, null, null);
         }
 
         [Fact]
-        public void GetCreationTime_FileDoesExist()
+        public void FileExists_InvalidCharacters()
+        {
+            var mockFileSystem = new MockFileSystem();
+            var realFileSystem = new FileSystem();
+
+            Func<IFileSystem, FileSystemType, FileInfoBase, bool> execute = (fs, _, file) => fs.File.Exists("|");
+
+            execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, null, null);
+        }
+
+        [Fact]
+        public void FileExists_FileDoesExist()
         {
             Func<IFileSystem, FileInfoBase> prepare = system =>
             {
                 var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture));
                 var tempDirectory2 = system.Directory.CreateDirectory(tempPath);
                 _output.WriteLine("Temporary Directory {0}", tempDirectory2.FullName);
-                var realFilePath = tempPath  + "\\mustexist.txt";
+                var realFilePath = tempPath + "\\willbecreated.txt";
                 var result = system.FileInfo.FromFileName(realFilePath);
-                system.File.AppendAllText(result.FullName, "foo");
+                result.CreateFileWithNoContent();
+
                 return result;
             };
 
@@ -60,21 +71,20 @@ namespace System.IO.Abstractions.Tests.Comparison
 
             var realFile = prepare(realFileSystem);
             var mockFile = prepare(mockFileSystem);
-            Func<IFileSystem, FileSystemType, FileInfoBase, DateTime> execute = (fs, _, file) => fs.File.GetCreationTime(file.FullName);
+            Func<IFileSystem, FileSystemType, FileInfoBase, bool> execute = (fs, _, file) => fs.File.Exists(file.FullName);
 
-            Action<DateTime, DateTime> ignoreComparison = (_, __) => { };
-            execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, realFile, mockFile, null, ignoreComparison);
+            execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, realFile, mockFile);
         }
 
         [Fact]
-        public void GetCreationTime_FileDoesNotExist()
+        public void FileExists_FileDoesNoExist()
         {
             Func<IFileSystem, FileInfoBase> prepare = system =>
             {
                 var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture));
                 var tempDirectory2 = system.Directory.CreateDirectory(tempPath);
                 _output.WriteLine("Temporary Directory {0}", tempDirectory2.FullName);
-                var realFilePath = tempPath + "\\mustnotexist.txt";
+                var realFilePath = tempPath + "\\doesnotexist.txt";
                 var result = system.FileInfo.FromFileName(realFilePath);
                 return result;
             };
@@ -84,7 +94,7 @@ namespace System.IO.Abstractions.Tests.Comparison
 
             var realFile = prepare(realFileSystem);
             var mockFile = prepare(mockFileSystem);
-            Func<IFileSystem, FileSystemType, FileInfoBase, DateTime> execute = (fs, _, file) => fs.File.GetCreationTime(file.FullName);
+            Func<IFileSystem, FileSystemType, FileInfoBase, bool> execute = (fs, _, file) => fs.File.Exists(file.FullName);
 
             execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, realFile, mockFile);
         }

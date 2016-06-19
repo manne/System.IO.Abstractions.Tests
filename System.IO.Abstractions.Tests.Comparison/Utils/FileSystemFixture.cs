@@ -35,7 +35,11 @@ namespace System.IO.Abstractions.Tests.Comparison.Utils
         /// </summary>
         public void Dispose()
         {
-            Directory.Delete(BaseDirectory, true);
+            var directory = new DirectoryInfo(BaseDirectory);
+            if (directory.Exists)
+            {
+                directory.Delete(true);
+            }
         }
     }
 }

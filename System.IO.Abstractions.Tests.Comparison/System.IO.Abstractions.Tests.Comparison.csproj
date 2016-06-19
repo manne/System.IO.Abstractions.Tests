@@ -66,6 +66,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="File_Exists_Tests.cs" />
+    <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\FileSystemType.cs" />
     <Compile Include="Utils\Actor.cs" />
     <Compile Include="File_AppendAllLines_Tests.cs" />

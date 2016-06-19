@@ -45,7 +45,7 @@ namespace System.IO.Abstractions.Tests.Comparison.Utils
                     mockException.Should().NotBeNull("the interaction with the real file system fired an exception");
 
                     // ReSharper disable PossibleNullReferenceException Reason: code can not be reached if is null
-                    mockException.GetType().Should().Be(realException.GetType(), "the corresponding interaction on the mock file system should throw an exception of the the same type as the real file system");
+                    mockException.Should().BeOfType(realException.GetType(), "the corresponding interaction on the mock file system should throw an exception of the the same type as the real file system");
                     // ReSharper restore PossibleNullReferenceException
                 }
 
