@@ -7,38 +7,45 @@ using Xunit.Abstractions;
 namespace System.IO.Abstractions.Tests.Comparison
 {
     [Collection(CollectionDefinitions.THE_TRUTH)]
-    public class File_GetAttributes_Tests
+    public class File_Create_Tests
     {
         private readonly ITestOutputHelper _output;
+        private readonly FileSystemFixture _fileSystemFixture;
 
-        public File_GetAttributes_Tests(ITestOutputHelper output)
+        public File_Create_Tests(ITestOutputHelper output, FileSystemFixture fileSystemFixture)
         {
             if (output == null)
             {
                 throw new ArgumentNullException(nameof(output));
             }
 
+            if (fileSystemFixture == null)
+            {
+                throw new ArgumentNullException(nameof(fileSystemFixture));
+            }
+
             _output = output;
+            _fileSystemFixture = fileSystemFixture;
         }
 
         [Fact]
-        public void FileSetAttributes_ArgumentNull()
+        public void FileCreate_ArgumentNull()
         {
             var mockFileSystem = new MockFileSystem();
             var realFileSystem = new FileSystem();
 
-            Action<IFileSystem, FileSystemType, FileInfoBase> execute = (fs, _, file) => fs.File.GetAttributes(null);
+            Action<IFileSystem, FileSystemType, FileInfoBase> execute = (fs, _, file) => fs.File.Create(null);
 
-            execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, null, null);
+            execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, null, null, _output);
         }
 
         [Fact]
-        public void FileSetAttributes_EmptyPath()
+        public void FileCreate_InvalidCharacters()
         {
             var mockFileSystem = new MockFileSystem();
             var realFileSystem = new FileSystem();
 
-            Action<IFileSystem, FileSystemType, FileInfoBase> execute = (fs, _, file) => fs.File.GetAttributes(string.Empty);
+            Action<IFileSystem, FileSystemType, FileInfoBase> execute = (fs, _, file) => fs.File.Create("|");
 
             execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, null, null, _output);
         }

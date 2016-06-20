@@ -41,7 +41,7 @@ namespace System.IO.Abstractions.Tests.Comparison
             Action<IFileSystem, FileSystemType> action = (fs, _) => fs.File.AppendAllLines("|", new[] {"does not matter"});
 
             // Assert
-            action.OnFileSystems(realFileSystem, mockFileSystem);
+            action.OnFileSystems(realFileSystem, mockFileSystem, _output);
         }
 
         [Fact]

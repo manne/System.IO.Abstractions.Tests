@@ -6,15 +6,15 @@ using Xunit;
 namespace System.IO.Abstractions.Tests.Comparison
 {
     [Collection(CollectionDefinitions.THE_TRUTH)]
-    public class File_Encrypt_Tests
+    public class Directory_Create_Tests
     {
         [Fact]
-        public void FileDecrypt_ArgumentNull()
+        public void DirectoryCreate_ArgumentNull()
         {
             var mockFileSystem = new MockFileSystem();
             var realFileSystem = new FileSystem();
 
-            Action<IFileSystem, FileSystemType, FileInfoBase> execute = (fs, _, file) => fs.File.Encrypt(null);
+            Action<IFileSystem, FileSystemType, DirectoryInfoBase> execute = (fs, _, file) => fs.Directory.CreateDirectory(null);
 
             execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, null, null);
         }
