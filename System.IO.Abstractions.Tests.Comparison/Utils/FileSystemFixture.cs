@@ -14,7 +14,7 @@ namespace System.IO.Abstractions.Tests.Comparison.Utils
     /// Fixture to set a base directory in which the tests resides.
     /// Cleans up this directory after all the tests are run.
     /// </summary>
-    public class FileSystemFixture : IDisposable
+    public sealed class FileSystemFixture : IDisposable
     {
         /// <summary>
         /// Initializes a new instance of the class <see cref="FileSystemFixture"/>.

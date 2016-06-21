@@ -182,5 +182,111 @@ namespace System.IO.Abstractions.Tests.Comparison
             };
             execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, realFile, mockFile, null, comparer, _output);
         }
+
+        [Theory]
+        [MemberData(nameof(GetEncodings))]
+        public void WriteAndAppendAllLinesWithEncoding_ThenReadAllLinesWithEncoding(Encoding encoding)
+        {
+            var faker = new Bogus.Faker("ko");
+            var linesToWrite = new List<string>
+            {
+                faker.Lorem.Lines(20, Environment.NewLine),
+                faker.Lorem.Lines(20, Environment.NewLine)
+            };
+            var linesToAppend = new List<string>
+            {
+                faker.Lorem.Lines(20, Environment.NewLine),
+                faker.Lorem.Lines(20, Environment.NewLine)
+            };
+
+            Func<IFileSystem, FileSystemType, FileInfoBase> prepare = (system, type) =>
+            {
+                var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture));
+                var tempDirectory2 = system.Directory.CreateDirectory(tempPath);
+                _output.WriteLine("Temporary Directory {0} ({1})", tempDirectory2.FullName, type);
+                var realFilePath = system.Path.Combine(tempDirectory2.FullName, "willbecreated.txt");
+                var result = system.FileInfo.FromFileName(realFilePath);
+                return result;
+            };
+
+            var mockFileSystem = new MockFileSystem();
+            var realFileSystem = new FileSystem();
+
+            var realFile = prepare(realFileSystem, FileSystemType.Real);
+            var mockFile = prepare(mockFileSystem, FileSystemType.Mock);
+            Func<IFileSystem, FileSystemType, FileInfoBase, string[]> execute = (fs, fst, file) =>
+            {
+                fs.File.WriteAllLines(file.FullName, linesToWrite, encoding);
+                fs.File.AppendAllLines(file.FullName, linesToAppend, encoding);
+                var l = fs.File.ReadAllLines(file.FullName, encoding);
+                return l;
+            };
+
+            Actor.CustomResultComparer<string[]> comparer = (r, m) =>
+            {
+                if (r == null)
+                {
+                    m.Should().BeNull();
+                }
+                else
+                {
+                    m.Should().ContainInOrder(r, "the content in the mock file system should be the same as in the real file system");
+                }
+            };
+            execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, realFile, mockFile, null, comparer, _output);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetEncodings))]
+        public void WriteWithEncodingAndAppendAllLinesWithDifferentEncoding_ThenReadAllLinesWithEncoding(Encoding encoding)
+        {
+            var faker = new Bogus.Faker("ko");
+            var linesToWrite = new List<string>
+            {
+                faker.Lorem.Lines(20, Environment.NewLine),
+                faker.Lorem.Lines(20, Environment.NewLine)
+            };
+            var linesToAppend = new List<string>
+            {
+                faker.Random.Words(344),
+                faker.Lorem.Lines(20, Environment.NewLine)
+            };
+
+            Func<IFileSystem, FileSystemType, FileInfoBase> prepare = (system, type) =>
+            {
+                var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture));
+                var tempDirectory2 = system.Directory.CreateDirectory(tempPath);
+                _output.WriteLine("Temporary Directory {0} ({1})", tempDirectory2.FullName, type);
+                var realFilePath = system.Path.Combine(tempDirectory2.FullName, "willbecreated.txt");
+                var result = system.FileInfo.FromFileName(realFilePath);
+                return result;
+            };
+
+            var mockFileSystem = new MockFileSystem();
+            var realFileSystem = new FileSystem();
+
+            var realFile = prepare(realFileSystem, FileSystemType.Real);
+            var mockFile = prepare(mockFileSystem, FileSystemType.Mock);
+            Func<IFileSystem, FileSystemType, FileInfoBase, string[]> execute = (fs, fst, file) =>
+            {
+                fs.File.WriteAllLines(file.FullName, linesToWrite, encoding);
+                fs.File.AppendAllLines(file.FullName, linesToAppend, Encoding.UTF7);
+                var l = fs.File.ReadAllLines(file.FullName, encoding);
+                return l;
+            };
+
+            Actor.CustomResultComparer<string[]> comparer = (r, m) =>
+            {
+                if (r == null)
+                {
+                    m.Should().BeNull();
+                }
+                else
+                {
+                    m.Should().ContainInOrder(r, "the content in the mock file system should be the same as in the real file system");
+                }
+            };
+            execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, realFile, mockFile, null, comparer, _output);
+        }
     }
 }
