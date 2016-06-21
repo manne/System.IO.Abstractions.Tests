@@ -1,4 +1,5 @@
-﻿using System.IO.Abstractions.TestingHelpers;
+﻿using System.Globalization;
+using System.IO.Abstractions.TestingHelpers;
 using System.IO.Abstractions.Tests.Comparison.Utils;
 
 using Xunit;
@@ -70,6 +71,59 @@ namespace System.IO.Abstractions.Tests.Comparison
             Action<IFileSystem, FileSystemType, FileInfoBase> execute = (fs, _, file) => fs.File.Move("foo.txt", "|");
 
             execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, null, null, _output);
+        }
+
+        [Fact]
+        public void FileMove_SourceDoesExist_DestinationDoesExist()
+        {
+            var subFolderPath = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture);
+            Func<IFileSystem, Tuple<FileInfoBase, FileInfoBase>> prepare = system =>
+            {
+                var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, subFolderPath);
+                var tempDirectory2 = system.Directory.CreateDirectory(tempPath);
+                _output.WriteLine("Temporary Directory {0}", tempDirectory2.FullName);
+                var sourcePath = tempPath + "\\source.txt";
+                var source = system.FileInfo.FromFileName(sourcePath);
+                source.CreateFileWithNoContent();
+                var destinationPath = tempPath + "\\destination.txt";
+                var destination = system.FileInfo.FromFileName(destinationPath);
+                destination.CreateFileWithNoContent();
+                return Tuple.Create(source, destination);
+            };
+
+            var mockFileSystem = new MockFileSystem();
+            var realFileSystem = new FileSystem();
+
+            var realFile = prepare(realFileSystem);
+            var mockFile = prepare(mockFileSystem);
+            Action<IFileSystem, FileSystemType, Tuple<FileInfoBase, FileInfoBase>> execute = (fs, _, tuple) => fs.File.Move(tuple.Item1.FullName, tuple.Item2.FullName);
+            execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, realFile, mockFile);
+        }
+
+        [Fact]
+        public void FileMove_SourceDoesNotExist_DestinationDoesExist()
+        {
+            var subFolderPath = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture);
+            Func<IFileSystem, Tuple<FileInfoBase, FileInfoBase>> prepare = system =>
+            {
+                var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, subFolderPath);
+                var tempDirectory2 = system.Directory.CreateDirectory(tempPath);
+                _output.WriteLine("Temporary Directory {0}", tempDirectory2.FullName);
+                var sourcePath = tempPath + "\\sourceNotExists.txt";
+                var source = system.FileInfo.FromFileName(sourcePath);
+                var destinationPath = tempPath + "\\destination.txt";
+                var destination = system.FileInfo.FromFileName(destinationPath);
+                destination.CreateFileWithNoContent();
+                return Tuple.Create(source, destination);
+            };
+
+            var mockFileSystem = new MockFileSystem();
+            var realFileSystem = new FileSystem();
+
+            var realFile = prepare(realFileSystem);
+            var mockFile = prepare(mockFileSystem);
+            Action<IFileSystem, FileSystemType, Tuple<FileInfoBase, FileInfoBase>> execute = (fs, _, tuple) => fs.File.Move(tuple.Item1.FullName, tuple.Item2.FullName);
+            execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, realFile, mockFile);
         }
     }
 }

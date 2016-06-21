@@ -14,7 +14,9 @@ namespace System.IO.Abstractions.Tests.Comparison.Utils
     /// Fixture to set a base directory in which the tests resides.
     /// Cleans up this directory after all the tests are run.
     /// </summary>
+    // ReSharper disable ClassNeverInstantiated.Global Reason: the class is initialized by xunit
     public sealed class FileSystemFixture : IDisposable
+    // ReSharper restore ClassNeverInstantiated.Global
     {
         /// <summary>
         /// Initializes a new instance of the class <see cref="FileSystemFixture"/>.
@@ -35,11 +37,25 @@ namespace System.IO.Abstractions.Tests.Comparison.Utils
         /// </summary>
         public void Dispose()
         {
+            // only the real file system must be cleaned up
             var directory = new DirectoryInfo(BaseDirectory);
-            if (directory.Exists)
+            DeleteRecursiveFolder(directory);
+        }
+
+        private void DeleteRecursiveFolder(DirectoryInfo directory)
+        {
+            foreach (DirectoryInfo subDirectory in directory.GetDirectories())
             {
-                directory.Delete(true);
+                DeleteRecursiveFolder(subDirectory);
             }
+
+            foreach (FileInfo file in directory.GetFiles())
+            {
+                file.Attributes = FileAttributes.Normal;
+                file.Delete();
+            }
+
+            directory.Delete();
         }
     }
 }

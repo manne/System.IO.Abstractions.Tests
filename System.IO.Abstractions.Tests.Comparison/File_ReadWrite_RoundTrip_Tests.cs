@@ -53,9 +53,10 @@ namespace System.IO.Abstractions.Tests.Comparison
                 faker.Lorem.Lines(20, Environment.NewLine)
             };
 
+            var subFolder = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture);
             Func<IFileSystem, FileSystemType, FileInfoBase> prepare = (system, type) =>
             {
-                var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture));
+                var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, subFolder);
                 var tempDirectory2 = system.Directory.CreateDirectory(tempPath);
                 _output.WriteLine("Temporary Directory {0} ({1})", tempDirectory2.FullName, type);
                 var realFilePath = system.Path.Combine(tempDirectory2.FullName, "willbecreated.txt");
@@ -100,9 +101,10 @@ namespace System.IO.Abstractions.Tests.Comparison
                 faker.Lorem.Lines(20, Environment.NewLine)
             };
 
+            var subFolder = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture);
             Func<IFileSystem, FileSystemType, FileInfoBase> prepare = (system, type) =>
             {
-                var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture));
+                var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, subFolder);
                 var tempDirectory2 = system.Directory.CreateDirectory(tempPath);
                 _output.WriteLine("Temporary Directory {0} ({1})", tempDirectory2.FullName, type);
                 var realFilePath = system.Path.Combine(tempDirectory2.FullName, "willbecreated.txt");
@@ -147,9 +149,10 @@ namespace System.IO.Abstractions.Tests.Comparison
                 faker.Lorem.Lines(20, Environment.NewLine)
             };
 
+            var subFolder = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture);
             Func<IFileSystem, FileSystemType, FileInfoBase> prepare = (system, type) =>
             {
-                var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture));
+                var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, subFolder);
                 var tempDirectory2 = system.Directory.CreateDirectory(tempPath);
                 _output.WriteLine("Temporary Directory {0} ({1})", tempDirectory2.FullName, type);
                 var realFilePath = system.Path.Combine(tempDirectory2.FullName, "willbecreated.txt");
@@ -199,9 +202,10 @@ namespace System.IO.Abstractions.Tests.Comparison
                 faker.Lorem.Lines(20, Environment.NewLine)
             };
 
+            var subFolder = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture);
             Func<IFileSystem, FileSystemType, FileInfoBase> prepare = (system, type) =>
             {
-                var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture));
+                var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, subFolder);
                 var tempDirectory2 = system.Directory.CreateDirectory(tempPath);
                 _output.WriteLine("Temporary Directory {0} ({1})", tempDirectory2.FullName, type);
                 var realFilePath = system.Path.Combine(tempDirectory2.FullName, "willbecreated.txt");
@@ -252,9 +256,10 @@ namespace System.IO.Abstractions.Tests.Comparison
                 faker.Lorem.Lines(20, Environment.NewLine)
             };
 
+            var subFolder = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture);
             Func<IFileSystem, FileSystemType, FileInfoBase> prepare = (system, type) =>
             {
-                var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture));
+                var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, subFolder);
                 var tempDirectory2 = system.Directory.CreateDirectory(tempPath);
                 _output.WriteLine("Temporary Directory {0} ({1})", tempDirectory2.FullName, type);
                 var realFilePath = system.Path.Combine(tempDirectory2.FullName, "willbecreated.txt");
@@ -276,6 +281,47 @@ namespace System.IO.Abstractions.Tests.Comparison
             };
 
             Actor.CustomResultComparer<string[]> comparer = (r, m) =>
+            {
+                if (r == null)
+                {
+                    m.Should().BeNull();
+                }
+                else
+                {
+                    m.Should().ContainInOrder(r, "the content in the mock file system should be the same as in the real file system");
+                }
+            };
+            execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, realFile, mockFile, null, comparer, _output);
+        }
+
+        [Fact]
+        public void WriteWithEncodingAndAppendAllLinesWithDifferentEncoding2_ThenReadAllLinesWithEncoding()
+        {
+            var subFolder = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture);
+            Func<IFileSystem, FileSystemType, FileInfoBase> prepare = (system, type) =>
+            {
+                var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, subFolder);
+                var tempDirectory2 = system.Directory.CreateDirectory(tempPath);
+                _output.WriteLine("Temporary Directory {0} ({1})", tempDirectory2.FullName, type);
+                var realFilePath = system.Path.Combine(tempDirectory2.FullName, "willbecreated.txt");
+                var result = system.FileInfo.FromFileName(realFilePath);
+                return result;
+            };
+
+            var mockFileSystem = new MockFileSystem();
+            var realFileSystem = new FileSystem();
+
+            var realFile = prepare(realFileSystem, FileSystemType.Real);
+            var mockFile = prepare(mockFileSystem, FileSystemType.Mock);
+            Func<IFileSystem, FileSystemType, FileInfoBase, byte[]> execute = (fs, fst, file) =>
+            {
+                fs.File.WriteAllText(file.FullName, "Demo text content");
+                fs.File.AppendAllText(file.FullName, " some text", Encoding.Unicode);
+                var b = fs.File.ReadAllBytes(file.FullName);
+                return b;
+            };
+
+            Actor.CustomResultComparer<byte[]> comparer = (r, m) =>
             {
                 if (r == null)
                 {

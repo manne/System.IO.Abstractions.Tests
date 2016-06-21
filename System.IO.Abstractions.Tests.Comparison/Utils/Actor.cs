@@ -64,7 +64,7 @@ namespace System.IO.Abstractions.Tests.Comparison.Utils
                     {
                         Action<string, Exception> writeException = (message, exception) => outputHelper?.WriteLine("{0} exception\nType: {1}\nMessage:\n{2}\n----------------", message, exception.GetType().FullName, exception.Message);
                         writeException("Real", realException);
-                        mockException.Should().NotBeNull("the interaction with the real file system fired an exception");
+                        mockException.Should().NotBeNull("the interaction with the real file system fired an exception (for the exception show below)");
 
                         // ReSharper disable PossibleNullReferenceException Reason: code can not be reached if is null
                         using (new AssertionScope())
@@ -75,6 +75,11 @@ namespace System.IO.Abstractions.Tests.Comparison.Utils
                         }
                         // ReSharper restore PossibleNullReferenceException
                     }
+                }
+
+                if (mockException == null)
+                {
+                    realException.Should().BeNull("the mock file system should not throw an exception if the real file system did not throw one");
                 }
 
                 if (customResultComparer != null)

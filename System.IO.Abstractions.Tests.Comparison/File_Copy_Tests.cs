@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.IO.Abstractions.TestingHelpers;
 using System.IO.Abstractions.Tests.Comparison.Utils;
+
 using Xunit;
 using Xunit.Abstractions;
 
@@ -86,11 +87,10 @@ namespace System.IO.Abstractions.Tests.Comparison
         [Fact]
         public void FileCopy_SourceDoesNotExist()
         {
-            var linesToAppend = "first line Î♫";
-
+            var subFolder = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture);
             Func<IFileSystem, Tuple<FileInfoBase, FileInfoBase>> prepare = system =>
             {
-                var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture));
+                var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, subFolder);
                 var tempDirectory2 = system.Directory.CreateDirectory(tempPath);
                 _output.WriteLine("Temporary Directory {0}", tempDirectory2.FullName);
                 var sourcePath = tempPath + "\\source.txt";
@@ -113,11 +113,10 @@ namespace System.IO.Abstractions.Tests.Comparison
         [Fact]
         public void FileCopy_SourceDoesExist_DestinationDoesExist()
         {
-            var linesToAppend = "first line Î♫";
-
+            var subFolderPath = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture);
             Func<IFileSystem, Tuple<FileInfoBase, FileInfoBase>> prepare = system =>
             {
-                var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture));
+                var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, subFolderPath);
                 var tempDirectory2 = system.Directory.CreateDirectory(tempPath);
                 _output.WriteLine("Temporary Directory {0}", tempDirectory2.FullName);
                 var sourcePath = tempPath + "\\source.txt";

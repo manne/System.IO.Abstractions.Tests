@@ -18,5 +18,16 @@ namespace System.IO.Abstractions.Tests.Comparison
 
             execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, null, null);
         }
+
+        [Fact]
+        public void FileDecrypt_ArgumentContainsInvalidCharacters()
+        {
+            var mockFileSystem = new MockFileSystem();
+            var realFileSystem = new FileSystem();
+
+            Action<IFileSystem, FileSystemType, FileInfoBase> execute = (fs, _, file) => fs.File.Decrypt("|||");
+
+            execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, null, null);
+        }
     }
 }

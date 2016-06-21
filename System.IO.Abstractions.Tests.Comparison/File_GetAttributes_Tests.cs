@@ -42,5 +42,27 @@ namespace System.IO.Abstractions.Tests.Comparison
 
             execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, null, null, _output);
         }
+
+        [Fact]
+        public void FileSetAttributes_ArgumentContainsInvalidCharacters()
+        {
+            var mockFileSystem = new MockFileSystem();
+            var realFileSystem = new FileSystem();
+
+            Action<IFileSystem, FileSystemType, FileInfoBase> execute = (fs, _, file) => fs.File.GetAttributes("||");
+
+            execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, null, null, _output);
+        }
+
+        [Fact]
+        public void FileGetAttributes_FileDoesNotExistButDirectory()
+        {
+            var mockFileSystem = new MockFileSystem().WithCurrentDirectory();
+            var realFileSystem = new FileSystem();
+
+            Action<IFileSystem, FileSystemType, FileInfoBase> execute = (fs, _, file) => fs.File.GetAttributes("doesnotexist.txt");
+
+            execute.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, null, null, _output);
+        }
     }
 }

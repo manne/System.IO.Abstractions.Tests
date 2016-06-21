@@ -44,9 +44,10 @@ namespace System.IO.Abstractions.Tests.Comparison
         [Fact]
         public void GetCreationTime_FileDoesExist()
         {
+            var subFolder = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture);
             Func<IFileSystem, FileInfoBase> prepare = system =>
             {
-                var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture));
+                var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, subFolder);
                 var tempDirectory2 = system.Directory.CreateDirectory(tempPath);
                 _output.WriteLine("Temporary Directory {0}", tempDirectory2.FullName);
                 var realFilePath = tempPath  + "\\mustexist.txt";
@@ -69,9 +70,10 @@ namespace System.IO.Abstractions.Tests.Comparison
         [Fact]
         public void GetCreationTime_FileDoesNotExist()
         {
+            var subFolder = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture);
             Func<IFileSystem, FileInfoBase> prepare = system =>
             {
-                var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture));
+                var tempPath = system.Path.Combine(_fileSystemFixture.BaseDirectory, subFolder);
                 var tempDirectory2 = system.Directory.CreateDirectory(tempPath);
                 _output.WriteLine("Temporary Directory {0}", tempDirectory2.FullName);
                 var realFilePath = tempPath + "\\mustnotexist.txt";

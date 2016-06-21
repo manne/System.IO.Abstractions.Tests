@@ -78,6 +78,7 @@
     <Compile Include="Directory_Time_Tests.cs" />
     <Compile Include="Directory_Create_Tests.cs" />
     <Compile Include="File_AppendAllLines_Tests.cs" />
+    <Compile Include="File_Delete_Tests.cs" />
     <Compile Include="File_ReadAllBytes_Tests.cs" />
     <Compile Include="File_Move_Tests.cs" />
     <Compile Include="File_Copy_Tests.cs" />
