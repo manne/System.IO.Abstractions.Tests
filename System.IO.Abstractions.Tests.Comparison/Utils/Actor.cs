@@ -19,6 +19,15 @@ namespace System.IO.Abstractions.Tests.Comparison.Utils
             }, realFileSystem, mockFileSystem, null, null, null, null, outputHelper);
         }
 
+        public static void OnFileSystems<TParameter>(this Func<IFileSystem, FileSystemType, TParameter> action, FileSystem realFileSystem, MockFileSystem mockFileSystem, ITestOutputHelper outputHelper = null)
+        {
+            OnFileSystemsWithParameter<object, object>((fileSystem, fileSystemType, _) =>
+            {
+                action(fileSystem, fileSystemType);
+                return null;
+            }, realFileSystem, mockFileSystem, null, null, null, null, outputHelper);
+        }
+
         public static void OnFileSystemsWithParameter<TParameter>(this Action<IFileSystem, FileSystemType, TParameter> action, FileSystem realFileSystem, MockFileSystem mockFileSystem, TParameter realParameter, TParameter mockParameter, ITestOutputHelper outputHelper = null)
         {
             OnFileSystemsWithParameter<TParameter, object>((fileSystem, fileSystemType, parameter) =>
@@ -91,7 +100,7 @@ namespace System.IO.Abstractions.Tests.Comparison.Utils
                     mockResult.Should().Be(realResult);
                 }
             }
-            catch
+            finally
             {
                 if (cleanAction != null)
                 {
@@ -104,8 +113,6 @@ namespace System.IO.Abstractions.Tests.Comparison.Utils
                         // we are not interested in exceptions in the clean up process
                     }
                 }
-
-                throw;
             }
         }
     }

@@ -7,12 +7,12 @@ using Xunit.Abstractions;
 namespace System.IO.Abstractions.Tests.Comparison
 {
     [Collection(CollectionDefinitions.THE_TRUTH)]
-    public class File_WriteAllLines_Tests
+    public class File_WriteAllBytes_Tests
     {
         private readonly ITestOutputHelper _output;
         private readonly FileSystemFixture _fileSystemFixture;
 
-        public File_WriteAllLines_Tests(ITestOutputHelper output, FileSystemFixture fileSystemFixture)
+        public File_WriteAllBytes_Tests(ITestOutputHelper output, FileSystemFixture fileSystemFixture)
         {
             if (output == null)
             {
@@ -31,21 +31,21 @@ namespace System.IO.Abstractions.Tests.Comparison
         [Theory]
         [InlineData("|")]
         [InlineData("<<<<")]
-        public void WriteAllLines_PathContainsInvalidCharacters(string path)
+        public void WriteAllBytes_PathContainsInvalidCharacters(string path)
         {
             // Arrange
             var mockFileSystem = new MockFileSystem();
             var realFileSystem = new FileSystem();
 
             // Act
-            Action<IFileSystem, FileSystemType> action = (fs, _) => fs.File.WriteAllLines(path, new [] { "does not matter" });
+            Action<IFileSystem, FileSystemType> action = (fs, _) => fs.File.WriteAllBytes(path, new byte[] { 1 });
 
             // Assert
             action.OnFileSystems(realFileSystem, mockFileSystem, _output);
         }
 
         [Fact]
-        public void WriteAllLines_DirectoryDoesNotExist()
+        public void WriteAllBytes_DirectoryDoesNotExist()
         {
             // Arrange
             var mockFileSystem = new MockFileSystem();
@@ -63,7 +63,7 @@ namespace System.IO.Abstractions.Tests.Comparison
             var realFile = prepare(realFileSystem);
 
             // Act
-            Action<IFileSystem, FileSystemType, FileInfoBase> action = (fs, _, f) => fs.File.WriteAllLines(f.FullName, new[] { "does not matter" });
+            Action<IFileSystem, FileSystemType, FileInfoBase> action = (fs, _, f) => fs.File.WriteAllBytes(f.FullName, new byte[] { 1 });
 
             // Assert
             action.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, realFile, mockFile, _output);
@@ -88,7 +88,7 @@ namespace System.IO.Abstractions.Tests.Comparison
             var realFile = prepare(realFileSystem);
 
             // Act
-            Action<IFileSystem, FileSystemType, FileInfoBase> action = (fs, _, f) => fs.File.WriteAllLines(f.FullName, new[] { "does not matter" });
+            Action<IFileSystem, FileSystemType, FileInfoBase> action = (fs, _, f) => fs.File.WriteAllBytes(f.FullName, new byte[] { 1 });
 
             // Assert
             action.OnFileSystemsWithParameter(realFileSystem, mockFileSystem, realFile, mockFile, _output);

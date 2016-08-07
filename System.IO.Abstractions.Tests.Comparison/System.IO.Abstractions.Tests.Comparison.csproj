@@ -74,6 +74,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DirectoryInfo_Constructor_Tests.cs" />
+    <Compile Include="DirectoryInfo_FullName_Tests.cs" />
     <Compile Include="Directory_EnumerateDirectories_Tests.cs" />
     <Compile Include="Directory_Time_Tests.cs" />
     <Compile Include="Directory_Create_Tests.cs" />
@@ -83,6 +85,7 @@
     <Compile Include="File_Move_Tests.cs" />
     <Compile Include="File_Copy_Tests.cs" />
     <Compile Include="File_Create_Tests.cs" />
+    <Compile Include="File_WriteAllBytes_Tests.cs" />
     <Compile Include="File_WriteAllLines_Tests.cs" />
     <Compile Include="File_Encrypt_Tests.cs" />
     <Compile Include="File_Decrypt_Tests.cs" />
@@ -91,6 +94,7 @@
     <Compile Include="File_SetAttributes_Tests.cs" />
     <Compile Include="File_Exists_Tests.cs" />
     <Compile Include="File_ReadWrite_RoundTrip_Tests.cs" />
+    <Compile Include="Path_GetFullPath_Tests.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\FileSystemType.cs" />
     <Compile Include="Utils\Actor.cs" />

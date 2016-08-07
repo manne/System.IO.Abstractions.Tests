@@ -24,7 +24,7 @@ namespace System.IO.Abstractions.Tests.Comparison.Utils
         /// </summary>
         public FileSystemFixture()
         {
-            BaseDirectory = Path.GetTempPath() + "\\sioa";
+            BaseDirectory = Path.GetTempPath() + "sioa";
         }
 
         /// <summary>
@@ -39,7 +39,14 @@ namespace System.IO.Abstractions.Tests.Comparison.Utils
         {
             // only the real file system must be cleaned up
             var directory = new DirectoryInfo(BaseDirectory);
-            DeleteRecursiveFolder(directory);
+            try
+            {
+                DeleteRecursiveFolder(directory);
+            }
+            catch (Exception)
+            {
+                // do nothing
+            }
         }
 
         private void DeleteRecursiveFolder(DirectoryInfo directory)

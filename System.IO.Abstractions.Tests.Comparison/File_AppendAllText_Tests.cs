@@ -96,7 +96,7 @@ namespace System.IO.Abstractions.Tests.Comparison
                 _output.WriteLine("Temporary Directory {0}", tempDirectory2.FullName);
                 var realFilePath = tempPath + "\\willbecreated.txt";
                 var result = system.FileInfo.FromFileName(realFilePath);
-                //result.
+                result.CreateFileWithNoContent();
                 result.Attributes |= FileAttributes.ReadOnly;
                 return result;
             };
